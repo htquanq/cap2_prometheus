@@ -1,0 +1,17 @@
+group:
+  - name: app
+    rules:
+      - alert: TooManyHTTPStatusCode500
+        expr: flask_request_count_total{http_status="500"} > 10
+        for: 1m
+        labes: 
+          severity: critical
+        annotations:
+          description: "Too many HTTP stattus code 500 in 1minutes\n  VALUE = {{ $value }}"
+      - alert: TooManyHTTPStatusCode401
+        expr: count(flask_request_count_total{http_status="401"}) > 20
+        for: 1m
+        labes: 
+          severity: critical
+        annotations:
+          description: "Too many HTTP stattus code 401 in 1minutes\n  VALUE = {{ $value }}"

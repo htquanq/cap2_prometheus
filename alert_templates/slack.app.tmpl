@@ -1,0 +1,8 @@
+{{ define "slack.custom.text" }}
+  {{ range .Alerts }}
+    {{ if .Labels.severity }} *Severity*: {{ .Labels.severity }}{{- end -}}
+    {{ if .Labels.catalog }}{{- "\n" -}} *Catalog*: {{ .Labels.catalog }}{{- end -}}
+    {{ if .Annotations.summary }}{{- "\n" -}} *Summary*: {{ .Annotations.summary }}{{- end -}}
+    {{ if .Annotations.description }}{{- "\n" -}} *Description*: {{ .Annotations.description }}{{- end -}}
+  {{ end }}
+{{ end }}
