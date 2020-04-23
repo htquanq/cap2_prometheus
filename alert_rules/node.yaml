@@ -1,5 +1,5 @@
 groups:
-  - name: alert_rules
+  - name: system monitoring
     rules:
       - alert: InstanceDown
         expr: up == 0

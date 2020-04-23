@@ -1,17 +1,64 @@
-group:
-  - name: app
+groups:
+  - name: application monitoring
     rules:
+      - alert: InstanceDown
+        expr: up == 0
+        for: 30s
+        labels:
+          severity: critical
       - alert: TooManyHTTPStatusCode500
-        expr: flask_request_count_total{http_status="500"} > 10
+        expr: rate(flask_request_count_total{http_status="500"}[1m]) * 100 > 5
         for: 1m
-        labes: 
+        labels:
           severity: critical
         annotations:
-          description: "Too many HTTP stattus code 500 in 1minutes\n  VALUE = {{ $value }}"
+          summary: "TooManyHTTPStatusCode500 (instance {{ $labels.instance }})"
+          description: "TooManyHTTPStatusCode500 >5\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      - alert: HostHighCpuLoad
+        expr: 100 - (avg by(instance) (irate(process_cpu_seconds_total[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Host high CPU load (instance {{ $labels.instance }})"
+          description: "CPU load is > 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      - alert: ContainerMemoryUsage
+        expr: (sum(process_virtual_memory_bytes) BY (instance, name) / sum(process_resident_memory_bytes) BY (instance, name) * 100) > 80
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Container Memory usage (instance {{ $labels.instance }})"
+          description: "Container Memory usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      - alert: ContainerCpuUsage
+        expr: (sum(rate(process_cpu_seconds_total[3m])) BY (instance, name) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container CPU usage (instance {{ $labels.instance }})"
+          description: "Container CPU usage is above 80%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      - alert: TooManyHTTPStatusCode404
+        expr: rate(flask_request_count_total{http_status="404"}[1m]) * 100 > 5
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "TooManyHTTPStatusCode404 (instance {{ $labels.instance }})"
+          description: "TooManyHTTPStatusCode404 >5\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
       - alert: TooManyHTTPStatusCode401
-        expr: count(flask_request_count_total{http_status="401"}) > 20
+        expr: rate(flask_request_count_total{http_status="401"}[1m]) * 100 > 5
         for: 1m
-        labes: 
-          severity: critical
+        labels:
+          severity: warning
         annotations:
-          description: "Too many HTTP stattus code 401 in 1minutes\n  VALUE = {{ $value }}"
+          summary: "TooManyHTTPStatusCode401 (instance {{ $labels.instance }})"
+          description: "TooManyHTTPStatusCode401 >5\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+      - alert: HostOutOfMemory
+        expr: process_resident_memory_bytes / process_virtual_memory_bytes * 100 < 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host out of memory (instance {{ $labels.instance }})"
+          description: "Node memory is filling up (< 10% left)\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
