@@ -6,6 +6,9 @@ groups:
         for: 30s
         labels:
           severity: critical
+        annotations:
+          summary: "Prometheus target missing (instance {{ $labels.instance }})"
+          description: "A Prometheus target has disappeared. An exporter might be crashed.\n  VALUE = {{ $value }}\n  LABELS: {{ $labels.$instance }}"
       - alert: TooManyHTTPStatusCode500
         expr: rate(flask_request_count_total{http_status="500"}[1m]) * 100 > 5
         for: 1m

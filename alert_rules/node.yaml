@@ -45,7 +45,7 @@ groups:
           description: "[{{ $labels.instance }}] has only {{ $value }}% or less free."
       
       - alert: OutOfInodes
-        expr: node_filesystem_files_free{mountpoint="/rootfs"} / node_filesystem_files{mountpoint="/rootfs"} * 100 < 10 # Available inode < 10%
+        expr: node_filesystem_files_free / node_filesystem_files * 100 < 10 # Available inode < 10%
         for: 10s
         labels:
           catalog: disk
