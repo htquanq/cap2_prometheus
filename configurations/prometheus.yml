@@ -16,12 +16,22 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
       
-  - job_name: 'redis_exporter'
+  - job_name: 'redis_exporter' # Redis cluster monitor
     scrape_interval: 5s
     scrape_timeout: 5s
-    metrics_path: "/metrics"
+    metrics_path: "/scrape"
     static_configs:
-      - targets: ['192.168.43.132:9121']
+      - targets:
+        - '192.168.43.132:6379'
+        - '192.168.43.132:6380'
+        - '192.168.43.132:6381'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 192.168.43.132:9121
 
   - job_name: 'node_exporter'
     scrape_interval: 5s
@@ -39,3 +49,5 @@ scrape_configs:
 
 rule_files:
   - alerts/app.yaml
+  - alerts/node.yaml
+  - alerts/redis.yaml
