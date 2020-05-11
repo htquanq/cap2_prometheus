@@ -33,14 +33,6 @@ groups:
         annotations:
           summary: "Redis disconnected slaves (instance {{ $labels.instance }})"
           description: "Redis not replicating for all slaves. Consider reviewing the redis replication status.\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
-      - alert: RedisReplicationBroken
-        expr: delta(redis_connected_slaves[1m]) < 0
-        for: 10s
-        labels:
-          severity: critical
-        annotations:
-          summary: "Redis replication broken (instance {{ $labels.instance }})"
-          description: "Redis instance lost a slave\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
       - alert: RedisMissingBackup
         expr: time() - redis_rdb_last_save_timestamp_seconds > 60 * 60 * 24
         for: 10s
